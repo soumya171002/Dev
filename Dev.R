@@ -55,12 +55,18 @@ data_3 <- data_3 |>
                            0.065785617, 0.071990653, 0.047821653, 0.052646005, 
                            0.013304797, 0.002682987, 0.007267141, 0.002104511,
                            0.001521529)) |>
-  mutate(alt_wt_lp = (lp * emp_share_alt))
+  mutate(alt_wt_lp = (lp * emp_share_alt)) |>
+  mutate(alt_lp = (VA / (emp_share_alt * 59696514)))
 
  # percentage change in labor productivity
 data_3 |>
   filter(sectors != "Total") |>
   summarise(salp = sum(alt_wt_lp), slp = sum(wt_lp)) |>
+  summarise(change = ((salp - slp) / slp) * 100)
+
+data_3 |>
+  filter(sectors != "Total") |>
+  summarise(salp = sum(alt_lp), slp = sum(lp)) |>
   summarise(change = ((salp - slp) / slp) * 100)
 # attempted to make a new column for the agri and manufacturing flip but that wasn't working. 
 # Open to any suggestions
@@ -84,7 +90,7 @@ dat <- data |>
 
 # below is one attempt
 dat_6 <- dat |>
-  mutate(lp = log(lp)) |>
+  filter(sectors != "Total") |>
   group_by(year) |>
   summarise(mean = mean(lp), sd = sd(lp)) |>
   mutate(coef_var = sd / mean) |>
@@ -107,6 +113,7 @@ dat |>
 #Q6---------------------------------
 
 dat_4 <- dat |>
+  filter(sectors != "Total") |>
   mutate(broad_sectors = case_when(
     sectors == "Agriculture" ~ "Agriculture",
     sectors == "Manufacturing" | sectors == "Mining"
