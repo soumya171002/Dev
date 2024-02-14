@@ -36,8 +36,6 @@ data_3_graph <- data_3 |>
                   0.9731190,0.9864238,0.9891068,0.9963740,0.9984785))
   
 
-#per worker and per capita difference 
-#Normlaised 0.353, emp share 0.433
 #Q3-------------------------------------
 
 data_3_graph |> 
@@ -87,14 +85,10 @@ dat <- data |>
 # below is one attempt
 dat_6 <- dat |>
   mutate(lp = log(lp)) |>
-  group_by(sectors) |>
+  group_by(year) |>
   summarise(mean = mean(lp), sd = sd(lp)) |>
-  mutate(coef_var = mean / sd)
-
-dat |>
-  left_join(dat_6, by = "sectors") |>
-  mutate(lp = log(lp)) |>
-  ggplot(aes(x = coef_var, y = lp, color = sectors)) +
+  mutate(coef_var = sd / mean) |>
+  ggplot(aes(x = year, y = coef_var)) +
   geom_point()
 
 #this is another attempt
