@@ -47,7 +47,10 @@ data_3_graph |>
        the economywide labor productivity = 1")+
   theme_classic() +
   theme(legend.position = "bottom")
- 
+ #Agri is hiring a lot, services sectors employs lowest amount and there is 
+##huge gap in productivity across sectors and going way beyond 1, the normalised total productivity.
+##Agri. lowest productivity, manifacturing is just 0.15 emp share considerinh importamce in exports 
+##inverse relatinionship between productivity according to theory 
 #Q4-------------------------------------------
 data_3 <- data_3 |>
   mutate(wt_lp = (lp * emp_share)) |>
@@ -90,7 +93,7 @@ dat_6 <- dat |>
   mutate(coef_var = sd / mean) |>
   ggplot(aes(x = year, y = coef_var)) +
   geom_point()
-
+dat_6
 #this is another attempt
 dat_avg <- dat |>
   group_by(sectors) |>
@@ -104,6 +107,7 @@ dat |>
   ggplot(aes(x = coef_var, y = lp, color = sectors)) +
   geom_point()
 
+#Over time, the cov is reducing 
 #Q6---------------------------------
 
 dat_4 <- dat |>
