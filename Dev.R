@@ -84,13 +84,27 @@ dat <- data |>
 
 # I would suggest we use the above as the master data set and then proceed to Q1
 
+# below is one attempt
+dat_6 <- dat |>
+  mutate(lp = log(lp)) |>
+  group_by(sectors) |>
+  summarise(mean = mean(lp), sd = sd(lp)) |>
+  mutate(coef_var = mean / sd)
+
+dat |>
+  left_join(dat_6, by = "sectors") |>
+  mutate(lp = log(lp)) |>
+  ggplot(aes(x = coef_var, y = lp, color = sectors)) +
+  geom_point()
+
+#this is another attempt
 dat_avg <- dat |>
   group_by(sectors) |>
   summarise(avg_lp = mean(lp))
 
-dat |>
+dat |> 
   left_join(dat_avg, by = "sectors") |>
-  mutate(lp = log(lp),
+ mutate(lp = log(lp),
          avg_lp  = log(avg_lp),
     coef_var = (lp - avg_lp) / avg_lp) |>
   ggplot(aes(x = coef_var, y = lp, color = sectors)) +
