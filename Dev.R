@@ -36,6 +36,8 @@ data_3_graph <- data_3 |>
                   0.9731190,0.9864238,0.9891068,0.9963740,0.9984785))
   
 
+#per worker and per capita difference 
+#Normlaised 0.353, emp share 0.433
 #Q3-------------------------------------
 
 data_3_graph |> 
