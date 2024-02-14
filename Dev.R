@@ -1,4 +1,5 @@
 library(tidyverse)
+library(ggplot2)
 
 data <- read_rds("ETD_230918.RDS")
 
@@ -15,7 +16,7 @@ data_2 <- data_1 |>
   pivot_longer(cols = c("Agriculture", "Manufacturing","Mining", "Utilities", "Construction",
                         "Trade", "Transport", "Business", "Finance", "Realestate", "Government", "Other", "Total"),
                names_to = "sectors",
-               values_to = "value") |> 
+               values_to = "value") |>
   pivot_wider(id_cols = "sectors",
               names_from = "var",
               values_from = "value")
@@ -118,4 +119,40 @@ dat_4 <- dat |>
   )) |>
   filter(year == 1990 | year == 2005 | year == 2018) |>
   select(-c(sectors))
+
+#Q7 ---------------------------------
+
+dat_5 <- dat_4 |>
+  group_by(broad_sectors, year) |>
+  summarise(VA = sum(VA), emp = sum(emp)) |>
+  mutate(lp = VA/emp)
+
+dat_6 <- dat_5 |>
+  group_by(year) |>
+  summarise(LP = sum(lp),
+            EMP = sum(emp))
+
+merged_dat <- left_join(dat_5, dat_6, by = "year") |>
+  mutate(emp_share = (emp/EMP))
+  
+  
+merged_dat_1 <- merged_dat |>
+  filter(year == "1990"| year == "2005") |>
+  mutate(del_LP = ifelse(year == "2005", LP - lag(LP), NA),
+         del_lp = ifelse(year == "2005", lp - lag(lp), NA),
+         within_1 = (lag(emp_share))*del_lp,
+         across_1 = (emp_share - lag(emp_share)) * lp)
+
+merged_dat_2 <- merged_dat |>
+  filter(year == "2005"| year == "2018") |>
+  mutate(del_LP = ifelse(year == "2018", LP - lag(LP), NA),
+         del_lp = ifelse(year == "2018", lp - lag(lp), NA),
+         within_2 = (lag(emp_share))*del_lp,
+         across_2 = (emp_share - lag(emp_share)) * lp)
+
+
+#Time Series Graph
+ggplot(data = merged_dat, aes(x = year, y = emp_share, group = broad_sectors, color = broad_sectors)) +
+  geom_line()
+
 
