@@ -145,10 +145,13 @@ merged_dat <- left_join(dat_5, dat_6, by = "year") |>
   
 merged_dat_1 <- merged_dat |>
   filter(year == "1990"| year == "2005") |>
+  group_by(broad_sectors, year) |> 
   mutate(del_LP = ifelse(year == "2005", LP - lag(LP), NA),
          del_lp = ifelse(year == "2005", lp - lag(lp), NA),
+         lag_empshare = lag(emp_share),
          within_1 = (lag(emp_share))*del_lp,
          across_1 = (emp_share - lag(emp_share)) * lp)
+
 
 merged_dat_2 <- merged_dat |>
   filter(year == "2005"| year == "2018") |>
