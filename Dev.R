@@ -1,7 +1,8 @@
 
 library(tidyverse)
 library(ggplot2)
-
+library(knitr)
+install.packages("knitr")
 data <- read_rds("ETD_230918.RDS")
 
 names(data)
@@ -175,12 +176,12 @@ wa_sum_2 <- merged_dat_2 |>
   summarise(check = (sum(across_2) + sum(within_2))) |>
   summarise(sum_check = sum(check))
 
-
-
 ggplot(data = merged_dat, aes(x = year, y = emp_share, group = broad_sectors, color = broad_sectors)) +
   geom_line() +
-  xlab("Years")+
-  ylab("Sector-wise Employment Share in Bangladesh")
+  labs(x = "Years", y = "Sector-wise Employment Share in Bangladesh", color = "Sector") +
+  scale_color_brewer(palette = "Set1") +
+  theme_minimal() +  
+  theme(legend.position = "right")
 
 # Q7 Explanation :
 # The within term accounts for approximately 53% of the total productivity change from 1990 to 2005
@@ -196,6 +197,5 @@ ggplot(data = merged_dat, aes(x = year, y = emp_share, group = broad_sectors, co
 
 # Q9 Explanation :
 # Covariance falling as a result of Productivity gap falling is a good thing.
-
 
 
