@@ -1,3 +1,4 @@
+
 library(tidyverse)
 library(ggplot2)
 
@@ -46,7 +47,8 @@ data_3_graph |>
   ylab("Sector-relative labor productivity, 
        the economywide labor productivity = 1")+
   theme_classic() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  labs(main = "Labor productivity gaps in Bangladesh, 2015.")
  #Agri is hiring a lot, services sectors employs lowest amount and there is 
 ##huge gap in productivity across sectors and going way beyond 1, the normalised total productivity.
 ##Agri. lowest productivity, manifacturing is just 0.15 emp share considerinh importamce in exports 
@@ -98,7 +100,8 @@ dat_6 <- dat |>
   summarise(mean = mean(lp), sd = sd(lp)) |>
   mutate(coef_var = sd / mean) |>
   ggplot(aes(x = year, y = coef_var)) +
-  geom_point()
+  geom_point()+
+  stat_smooth(method = "lm")
 dat_6
 #this is another attempt
 dat_avg <- dat |>
@@ -145,24 +148,54 @@ merged_dat <- left_join(dat_5, dat_6, by = "year") |>
   
 merged_dat_1 <- merged_dat |>
   filter(year == "1990"| year == "2005") |>
-  group_by(broad_sectors, year) |> 
   mutate(del_LP = ifelse(year == "2005", LP - lag(LP), NA),
          del_lp = ifelse(year == "2005", lp - lag(lp), NA),
-         lag_empshare = lag(emp_share),
-         within_1 = (lag(emp_share))*del_lp,
-         across_1 = (emp_share - lag(emp_share)) * lp)
+         with_1 = (lag(emp_share))*del_lp,
+         acro_1 = (emp_share - lag(emp_share)) * lp,
+         within_1 = with_1/del_LP,
+         across_1 = acro_1/del_LP) 
 
 
+
+wa_sum_1 <- merged_dat_1 |>
+  filter(year == "2005") |>
+  summarise(check = (sum(across_1) + sum(within_1)))|>
+  summarise(sum_check = sum(check))
 merged_dat_2 <- merged_dat |>
   filter(year == "2005"| year == "2018") |>
   mutate(del_LP = ifelse(year == "2018", LP - lag(LP), NA),
          del_lp = ifelse(year == "2018", lp - lag(lp), NA),
-         within_2 = (lag(emp_share))*del_lp,
-         across_2 = (emp_share - lag(emp_share)) * lp)
+         with_2 = (lag(emp_share))*del_lp,
+         acro_2 = (emp_share - lag(emp_share)) * lp,
+         within_2 = with_2/del_LP,
+         across_2 = acro_2/del_LP)
+
+wa_sum_2 <- merged_dat_2 |>
+  filter(year == "2018") |>
+  summarise(check = (sum(across_2) + sum(within_2))) |>
+  summarise(sum_check = sum(check))
 
 
-#Time Series Graph
+
 ggplot(data = merged_dat, aes(x = year, y = emp_share, group = broad_sectors, color = broad_sectors)) +
-  geom_line()
+  geom_line() +
+  xlab("Years")+
+  ylab("Sector-wise Employment Share in Bangladesh")
+
+# Q7 Explanation :
+# The within term accounts for approximately 53% of the total productivity change from 1990 to 2005
+# and the across term accounts for 47%. From 2005 to 2018, approximately 72% the change in productivity 
+# has resulted from within productivity changes in the sectors in Bangladesh and approximately 28 percentage
+# change in productivity resulted from labor movement across the sectors. From 2005 to 2018, the employment share
+# of services increased from 40% to 45%, and agriculture fell from 48% to 40%. 
+
+# Q8 Explanation :
+# In 1990 to 2005, approximately 25% in agriculture, 28% in manufacturing and 0.2% decrease in services. In 2005-2018, 
+# approximately 8.6% decrease in agriculture, 16.78% increase in manufacturing and 20.12% increase in services.
+
+
+# Q9 Explanation :
+# Covariance falling as a result of Productivity gap falling is a good thing.
+
 
 
