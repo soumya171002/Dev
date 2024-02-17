@@ -1,7 +1,8 @@
 
 library(tidyverse)
 library(ggplot2)
-
+library(knitr)
+install.packages("knitr")
 data <- read_rds("ETD_230918.RDS")
 
 names(data)
@@ -128,7 +129,7 @@ dat_5 <- dat_4 |>
 
 dat_6 <- dat_5 |>
   group_by(year) |>
-  summarise(LP = sum(lp),
+  summarise(LP = sum(VA)/sum(emp),
             EMP = sum(emp))
 
 merged_dat <- left_join(dat_5, dat_6, by = "year") |>
@@ -144,12 +145,11 @@ merged_dat_1 <- merged_dat |>
          within_1 = with_1/del_LP,
          across_1 = acro_1/del_LP) 
 
-
-
 wa_sum_1 <- merged_dat_1 |>
   filter(year == "2005") |>
-  summarise(check = (sum(across_1) + sum(within_1)))|>
+  summarise(check = sum(across_1) + sum(within_1))|>
   summarise(sum_check = sum(check))
+
 merged_dat_2 <- merged_dat |>
   filter(year == "2005"| year == "2018") |>
   mutate(del_LP = ifelse(year == "2018", LP - lag(LP), NA),
@@ -164,12 +164,12 @@ wa_sum_2 <- merged_dat_2 |>
   summarise(check = (sum(across_2) + sum(within_2))) |>
   summarise(sum_check = sum(check))
 
-
-
 ggplot(data = merged_dat, aes(x = year, y = emp_share, group = broad_sectors, color = broad_sectors)) +
   geom_line() +
-  xlab("Years")+
-  ylab("Sector-wise Employment Share in Bangladesh")
+  labs(x = "Years", y = "Sector-wise Employment Share in Bangladesh", color = "Sector") +
+  scale_color_brewer(palette = "Set1") +
+  theme_minimal() +  
+  theme(legend.position = "right")
 
 # Q7 Explanation :
 # The within term accounts for approximately 53% of the total productivity change from 1990 to 2005
@@ -185,6 +185,5 @@ ggplot(data = merged_dat, aes(x = year, y = emp_share, group = broad_sectors, co
 
 # Q9 Explanation :
 # Covariance falling as a result of Productivity gap falling is a good thing.
-
 
 
