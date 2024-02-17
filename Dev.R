@@ -101,22 +101,11 @@ dat_6 <- dat |>
   mutate(coef_var = sd / mean) |>
   ggplot(aes(x = year, y = coef_var)) +
   geom_point()+
-  stat_smooth(method = "lm")
-dat_6
-#this is another attempt
-dat_avg <- dat |>
-  group_by(sectors) |>
-  summarise(avg_lp = mean(lp))
+  stat_smooth(method = "lm") +
+  theme_bw() +
+  labs(x = "Time", y = "Coefficient of variation of 
+       labor productivity across sectors")
 
-dat |> 
-  left_join(dat_avg, by = "sectors") |>
- mutate(lp = log(lp),
-         avg_lp  = log(avg_lp),
-    coef_var = (lp - avg_lp) / avg_lp) |>
-  ggplot(aes(x = coef_var, y = lp, color = sectors)) +
-  geom_point()
-
-#Over time, the cov is reducing 
 #Q6---------------------------------
 
 dat_4 <- dat |>
